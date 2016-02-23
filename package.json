@@ -1,13 +1,16 @@
 {
   "name": "lazy-promise",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "ES6 lazy promise",
   "main": "index.js",
+  "jsnext:main": "index.es6.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "node --harmony ./tests/run"
+    "lint": "eslint index.js index.es6.js tests/**",
+    "test": "mocha ./tests",
+    "build": "node ./build && npm test && npm run lint"
   },
   "repository": {
     "type": "git",
@@ -26,6 +29,7 @@
   "devDependencies": {
     "chai": "^3.2.0",
     "chai-spies": "^0.7.0",
+    "eslint": "^2.2.0",
     "mocha": "^2.2.5"
   }
 }

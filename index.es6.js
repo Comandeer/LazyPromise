@@ -46,4 +46,4 @@ class LazyPromise extends Promise {
 	}
 }
 
-module.exports = LazyPromise;
+export default LazyPromise;

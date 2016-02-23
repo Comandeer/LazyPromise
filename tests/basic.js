@@ -1,199 +1,188 @@
-"use strict";
+'use strict';
 
-var LazyPromise = require('../index')
-,chai = require('chai')
-,expect = chai.expect;
+const LazyPromise = require( '../index' );
+const chai = require( 'chai' );
+const expect = chai.expect;
 
-chai.use(require('chai-spies'));
+chai.use( require( 'chai-spies' ) );
 
-describe('LazyPromise', function()
-{
-	it('is an instance of Promise', function()
-	{
-		var promise = new LazyPromise(function() {});
+describe( 'LazyPromise', () => {
+	it( 'is an instance of Promise', () => {
+		const promise = new LazyPromise( () => {} );
 
-		expect(promise).to.be.an.instanceof(Promise);
-	});
+		expect( promise ).to.be.an.instanceof( Promise );
+	} );
 
-	it('accepts only function as parameter', function()
-	{
-		var fn = function()
-		{
-			new LazyPromise('a');
+	it( 'accepts only function as parameter', () => {
+		const fn = () => {
+			new LazyPromise( 'a' );
 		};
 
-		expect(fn).to.throw(TypeError, 'Promise resolver string is not a function');
-	})
+		expect( fn ).to.throw( TypeError, 'Promise resolver string is not a function' );
+	} );
 
-	it('return a thenable', function()
-	{
-		var promise = new LazyPromise(function() {});
+	it( 'returns a thenable', () => {
+		const promise = new LazyPromise( () => {} );
 
-		expect(promise).to.have.property('then');
-		expect(promise.then).to.be.a('function');
-	});
+		expect( promise ).to.have.property( 'then' );
+		expect( promise.then ).to.be.a( 'function' );
+	} );
 
-	it('does not have any own properties', function()
-	{
-		var promise = new LazyPromise(function() {});
+	it( 'does not have any own properties', () => {
+		const promise = new LazyPromise( () => {} );
 
-		expect(Object.getOwnPropertyNames(promise)).to.be.empty;
-		expect(Object.getOwnPropertySymbols(promise)).to.be.empty;
-	});
-});
+		expect( Object.getOwnPropertyNames( promise ) ).to.be.empty;
+		expect( Object.getOwnPropertySymbols( promise ) ).to.be.empty;
+	} );
+} );
 
-describe('thenable', function()
-{
-	it('is called asynchronously', function()
-	{
-		var promise = new LazyPromise(function(resolve) {
+describe( 'thenable', () => {
+	it( 'is called asynchronously', () => {
+		const promise = new LazyPromise( ( resolve ) => {
 			resolve();
-		})
-		,spy = chai.spy();
+		} );
+		const spy = chai.spy();
 
-		promise.then(spy);
+		promise.then( spy );
 
-		expect(spy).to.not.have.been.called();
-	});
+		expect( spy ).to.not.have.been.called();
+	} );
 
-	it('returns promise', function()
-	{
-		var promise = new LazyPromise(function() {})
-		,ret = promise.then();
+	it( 'returns promise', () => {
+		const promise = new LazyPromise( () => {} );
+		const ret = promise.then();
 
-		expect(ret).to.be.an.instanceof(Promise);
-	});
+		expect( ret ).to.be.an.instanceof( Promise );
+	} );
 
-	it('calls only success callback on success', function(done)
-	{
-		var promise = new LazyPromise(function(resolve, reject) {
+	it( 'calls only success callback on success', ( done ) => {
+		const promise = new LazyPromise( ( resolve ) => {
 			resolve();
-		})
-		,success = chai.spy()
-		,failure = chai.spy();
+		} );
+		const success = chai.spy();
+		const failure = chai.spy();
 
-		promise.then(success, failure);
+		promise.then( success, failure );
 
-		setTimeout(function()
-		{
-			expect(success).to.have.been.called.once();
-			expect(failure).not.to.have.been.called();
+		setTimeout( () =>{
+			expect( success ).to.have.been.called.once();
+			expect( failure ).not.to.have.been.called();
 
 			done();
-		}, 20);
-	});
+		}, 20 );
+	} );
 
-	it('calls only failure callback on failure', function(done)
-	{
-		var promise = new LazyPromise(function(resolve, reject) {
+	it( 'calls only failure callback on failure', ( done ) => {
+		const promise = new LazyPromise( ( resolve, reject ) => {
 			reject();
-		})
-		,success = chai.spy()
-		,failure = chai.spy();
+		} );
+		const success = chai.spy();
+		const failure = chai.spy();
 
-		promise.then(success, failure);
+		promise.then( success, failure );
 
-		setTimeout(function()
-		{
-			expect(success).not.to.have.been.called();
-			expect(failure).to.have.been.called.once();
-
-			done();
-		}, 20);
-	});
-
-	it('passes value on success', function(done)
-	{
-		var value = {}
-		,promise = new LazyPromise(function(resolve, reject) {
-			resolve(value);
-		});
-
-		promise.then(function(param)
-		{
-			expect(param).to.be.equal(value);
+		setTimeout( () => {
+			expect( success ).not.to.have.been.called();
+			expect( failure ).to.have.been.called.once();
 
 			done();
-		});
-	});
+		}, 20 );
+	} );
 
-	it('passes value on failure', function(done)
-	{
-		var value = {}
-		,promise = new LazyPromise(function(resolve, reject) {
-			reject(value);
-		});
+	it( 'passes value on success', ( done ) => {
+		const value = {};
+		const promise = new LazyPromise( ( resolve ) => {
+			resolve( value );
+		} );
 
-		promise.then(function() {},
-		function(param)
-		{
-			expect(param).to.be.equal(value);
+		promise.then( ( param ) => {
+			expect( param ).to.be.equal( value );
 
 			done();
-		});
-	});
-});
+		} );
+	} );
 
-describe('factory callback', function()
-{
-	it('is not called when no action is taken', function(done)
-	{
-		var factory = chai.spy()
-		,promise = new LazyPromise(factory);
+	it( 'passes value on failure', ( done ) => {
+		const value = {};
+		const promise = new LazyPromise( ( resolve, reject ) => {
+			reject( value );
+		} );
 
-		setTimeout(function()
-		{
-			expect(factory).not.have.been.called();
+		promise.then( () => {}, ( param ) => {
+			expect( param ).to.be.equal( value );
 
 			done();
-		}, 20);
-	});
+		} );
+	} );
+} );
 
-	it('is called when then is invoked', function(done)
-	{
-		var factory = chai.spy(function(resolve, reject)
-		{
+describe( 'factory callback', () => {
+	it( 'is not called when no action is taken', ( done ) => {
+		const factory = chai.spy();
+		
+		new LazyPromise( factory );
+
+		setTimeout( () => {
+			expect( factory ).not.have.been.called();
+
+			done();
+		}, 20 );
+	} );
+
+	it( 'is called when then is invoked', ( done ) => {
+		const factory = chai.spy( ( resolve ) => {
 			resolve();
-		})
-		,promise = new LazyPromise(factory);
+		} );
+		const promise = new LazyPromise( factory );
 
-		promise.then(function() {});
+		promise.then( () => {} );
 
-		setTimeout(function()
-		{
-			expect(factory).to.have.been.called();
+		setTimeout( () => {
+			expect( factory ).to.have.been.called();
 
 			done();
-		}, 20);
+		}, 20 );
 
-	});
+	} );
 
-	it('is called only once', function(done)
-	{
-		var factory = chai.spy(function(resolve, reject)
-		{
+	it( 'is called when catch is invoked', ( done ) => {
+		const factory = chai.spy( ( resolve, reject ) => {
+			reject();
+		} );
+		const promise = new LazyPromise( factory );
+
+		promise.catch( () => {} );
+
+		setTimeout( () => {
+			expect( factory ).to.have.been.called();
+
+			done();
+		}, 20 );
+
+	} );
+
+	it( 'is called only once', ( done ) => {
+		const factory = chai.spy( ( resolve ) => {
 			resolve();
-		})
-		,promise = new LazyPromise(factory);
+		} );
+		const promise = new LazyPromise( factory );
 
-		promise.then(function() {});
-		promise.then(function() {});
+		promise.then( () => {} );
+		promise.catch( () => {} );
 
-		setTimeout(function()
-		{
-			expect(factory).to.have.been.called.once();
+		setTimeout( () => {
+			expect( factory ).to.have.been.called.once();
 
 			done();
-		}, 20);
-	});
+		}, 20 );
+	} );
 
-	it('is called asynchronously', function()
-	{
-		var factory = chai.spy()
-		,promise = new LazyPromise(factory);
+	it( 'is called asynchronously', () => {
+		const factory = chai.spy();
+		const promise = new LazyPromise( factory );
 
-		promise.then(function() {}, function() {});
+		promise.then( () => {}, () => {} );
 
-		expect(factory).not.have.been.called();
-	});
-});
+		expect( factory ).not.have.been.called();
+	} );
+} );
