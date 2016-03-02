@@ -119,7 +119,7 @@ describe( 'thenable', () => {
 describe( 'factory callback', () => {
 	it( 'is not called when no action is taken', ( done ) => {
 		const factory = chai.spy();
-		
+
 		new LazyPromise( factory );
 
 		setTimeout( () => {
