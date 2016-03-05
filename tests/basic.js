@@ -64,7 +64,7 @@ describe( 'thenable', () => {
 
 		promise.then( success, failure );
 
-		setTimeout( () =>{
+		setTimeout( () => {
 			expect( success ).to.have.been.called.once();
 			expect( failure ).not.to.have.been.called();
 
