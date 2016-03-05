@@ -19,7 +19,7 @@ class LazyPromise extends Promise {
 		super( _factory );
 
 		tmp.set( this, {
-			factory: factory,
+			factory,
 			resolve: _resolve,
 			reject: _reject
 		} );

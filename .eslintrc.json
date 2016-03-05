@@ -53,6 +53,7 @@
 		"prefer-template": 2,
 		"prefer-rest-params": 2,
 		"prefer-spread": 2,
+		"object-shorthand": [ 2, "always" ],
 		"no-array-constructor": 2,
 		"no-new-object": 2,
 		"new-cap": 2,
